@@ -1,13 +1,18 @@
 "use client";
 
+import Product from "@/components/products/Product";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { type Product as ProductType } from "@/db";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { QueryResult } from "@upstash/vector";
+import axios from "axios"; 
 import { ChevronDown, Filter } from "lucide-react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 const SORT_OPTIONS = [
   { name: "None", value: "none" },
@@ -19,6 +24,23 @@ export default function Home() {
   const [filter, setFilter] = useState({
     sort: "none",
   });
+
+  const { data: products } = useQuery({
+    queryKey: ["products"], // add more to cache aka dependencies
+    queryFn: async () => {
+      const { data } = await axios.post<QueryResult<ProductType>[]>(
+        "http://localhost:3000/api/products",
+        {
+          filter: {
+            sort: filter.sort,
+          },
+        }
+      );
+      return data;
+    },
+  });
+
+  console.log(products);
 
   return (
     <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -58,10 +80,28 @@ export default function Home() {
           </DropdownMenu>
 
           <button className="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden">
-            <Filter className="h-5 w-5"/>
+            <Filter className="h-5 w-5" />
           </button>
         </div>
       </div>
+
+      <section className="pb-24 pt-6">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
+          {/* filters */}
+          <div></div>
+
+          {/* product grid */}
+          <ul className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+            {products?.map((product) => {
+              return (
+                <Fragment key={product.id}>
+                  <Product product={product.metadata!}/>    {/* ! tells typescript that metadata exists 100% */}    
+                </Fragment>
+              );
+            })}
+          </ul>
+        </div>
+      </section>
     </main>
   );
 }
