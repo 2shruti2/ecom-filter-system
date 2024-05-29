@@ -1,6 +1,7 @@
 "use client";
 
 import Product from "@/components/products/Product";
+import ProductSkeleton from "@/components/products/ProductSkeleton";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +11,7 @@ import { type Product as ProductType } from "@/db";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { QueryResult } from "@upstash/vector";
-import axios from "axios"; 
+import axios from "axios";
 import { ChevronDown, Filter } from "lucide-react";
 import { Fragment, useState } from "react";
 
@@ -92,13 +93,18 @@ export default function Home() {
 
           {/* product grid */}
           <ul className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            {products?.map((product) => {
-              return (
-                <Fragment key={product.id}>
-                  <Product product={product.metadata!}/>    {/* ! tells typescript that metadata exists 100% */}    
-                </Fragment>
-              );
-            })}
+            {products
+              ? products.map((product) => {
+                  return (
+                    <Fragment key={product.id}>
+                      <Product product={product.metadata!} />{" "}
+                      {/* ! tells typescript that metadata exists 100% */}
+                    </Fragment>
+                  );
+                })
+              : new Array(12)
+                  .fill(null)
+                  .map((_, i) => <ProductSkeleton key={i} />)}
           </ul>
         </div>
       </section>

@@ -5,20 +5,24 @@ const Product = ({ product }: { product: Product }) => {
   return (
     <div className="group relative">
       <div className="max-lg:aspect-square w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 lg:h-80">
-        <Image src={product.imageId} width={700} height={700} priority={true} alt="product image" className="h-full w-full object-cover object-center" />
-        {/* <img src={product.imageId} alt="product image" className="h-full w-full object-cover object-center" /> */}
-        <div className="mt-4 flex justify-between">
-          <div>
-            <h3 className="text-sm text-gray-700">
-              {product.name}
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              Size {product.size.toUpperCase()}, {product.color}
-            </p>
-          </div>
-        </div>
-        <p className="text-sm font-medium text-gray-900">{product.price}</p>
+        <Image
+          src={product.imageId}
+          width={700}
+          height={700}
+          priority={true}
+          alt="product image"
+          className=" w-full object-cover object-center"
+        />
       </div>
+      <div className="mt-4 flex justify-between">
+        <div>
+          <h3 className="text-sm text-gray-700">{product.name}</h3>
+          <p className="mt-1 text-sm text-gray-500">
+            Size {product.size.toUpperCase()}, {product.color}
+          </p>
+        </div>
+      </div>
+      <p className="text-sm font-medium text-gray-900">{product.price}</p>
     </div>
   );
 };
