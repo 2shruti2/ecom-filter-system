@@ -93,6 +93,9 @@ export default function Home() {
         {
           filter: {
             sort: filter.sort,
+            color: filter.color,
+            price: filter.price.range,
+            size: filter.size,
           },
         }
       );
@@ -336,6 +339,16 @@ export default function Home() {
                       <Slider className={cn({
                         "opacity-50" : !filter.price.isCustom
                       })} 
+                      onValueChange={(range)=> {
+                        const [newMin, newMax] = range;
+                        setFilter((prev)=>({
+                          ...prev,
+                          price: {
+                            isCustom: true,
+                            range: [newMin, newMax]
+                          }
+                        }))
+                      }}
                       disabled={!filter.price.isCustom}
                       value={filter.price.isCustom ? filter.price.range : DEFAULT_CUSTOM_PRICE}
                       min={DEFAULT_CUSTOM_PRICE[0]}
