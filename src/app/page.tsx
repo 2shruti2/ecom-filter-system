@@ -13,6 +13,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Slider } from "@/components/ui/slider";
 import { type Product as ProductType } from "@/db";
 import { cn } from "@/lib/utils";
 import { ProductState } from "@/lib/validators/product-validator";
@@ -54,14 +55,14 @@ const PRICE_FILTERS = {
   id: "price",
   name: "Price",
   options: [
-    { value: [0, 100], label: "Any price" },
+    { value: [0, 1000], label: "Any price" },
     {
-      value: [0, 20],
-      label: "Under 20€",
+      value: [0, 600],
+      label: "Under 600",
     },
     {
-      value: [0, 40],
-      label: "Under 40€",
+      value: [0, 400],
+      label: "Under 400",
     },
     // custom option defined in JSX
   ],
@@ -122,6 +123,9 @@ export default function Home() {
   };
 
   console.log(filter);
+
+  const minPrice = Math.min(filter.price.range[0], filter.price.range[1]);
+  const maxPrice = Math.max(filter.price.range[0], filter.price.range[1]);
 
   return (
     <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -260,28 +264,86 @@ export default function Home() {
 
                 <AccordionContent className="pt-6 animate-none">
                   <ul className="space-y-4">
-                    {SIZE_FILTERS.options.map((option, optionIndex) => (
-                      <li key={option.value} className="flex items-center">
+                    {PRICE_FILTERS.options.map((option, optionIndex) => (
+                      <li key={option.label} className="flex items-center">
                         <input
-                          type="checkbox"
+                          type="radio"
                           onChange={() => {
-                            applyArrayFilter({
-                              category: "size",
-                              value: option.value,
-                            });
+                            setFilter((prev) => ({
+                              ...prev,
+                              price: {
+                                isCustom: false,
+                                range: [...option.value],
+                              },
+                            }));
                           }}
-                          checked={filter.size.includes(option.value)}
-                          id={`size-${optionIndex}`}
+                          checked={
+                            !filter.price.isCustom &&
+                            filter.price.range[0] === option.value[0] &&
+                            filter.price.range[1] === option.value[1] // checking if both the tuple value matches
+                          }
+                          id={`price-${optionIndex}`}
                           className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                         />
                         <label
-                          htmlFor={`size-${optionIndex}`}
+                          htmlFor={`price-${optionIndex}`}
                           className="ml-3 text-sm text-gray-600"
                         >
                           {option.label}
                         </label>
                       </li>
                     ))}
+
+                    <li className="flex justify-center flex-col gap-2">
+                      <div>
+                        <input
+                          type="radio"
+                          onChange={() => {
+                            setFilter((prev) => ({
+                              ...prev,
+                              price: {
+                                isCustom: true,
+                                range: [0, 1000],
+                              },
+                            }));
+                          }}
+                          id={`price-${PRICE_FILTERS.options.length}`}
+                          checked={filter.price.isCustom}
+                          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                        />
+                        <label
+                          htmlFor={`price-${PRICE_FILTERS.options.length}`}
+                          className="ml-3 text-sm text-gray-600"
+                        >
+                          Custom
+                        </label>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <p className="font-medium">Price</p>
+                        <div>
+                        {filter.price.isCustom
+                            ? minPrice.toFixed(0)
+                            : filter.price.range[0].toFixed(0)}{' '}
+                          -{' '}
+                          {filter.price.isCustom
+                            ? maxPrice.toFixed(0)
+                            : filter.price.range[1].toFixed(0)}{' '}
+                          
+                        </div>
+                      </div>
+
+                      <Slider className={cn({
+                        "opacity-50" : !filter.price.isCustom
+                      })} 
+                      disabled={!filter.price.isCustom}
+                      value={filter.price.isCustom ? filter.price.range : DEFAULT_CUSTOM_PRICE}
+                      min={DEFAULT_CUSTOM_PRICE[0]}
+                      max={DEFAULT_CUSTOM_PRICE[1]}
+                      defaultValue={DEFAULT_CUSTOM_PRICE}
+                      step={50}
+                      />
+                    </li>
                   </ul>
                 </AccordionContent>
               </AccordionItem>
