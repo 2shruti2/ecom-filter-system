@@ -91,7 +91,7 @@ export default function Home() {
     queryKey: ["products"], // add more to cache aka dependencies
     queryFn: async () => {
       const { data } = await axios.post<QueryResult<ProductType>[]>(
-        "http://localhost:3000/api/products",
+        "/api/products",
         {
           filter: {
             sort: filter.sort,
